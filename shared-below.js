@@ -23,7 +23,7 @@ document.getElementById("below-hero").innerHTML = `
     <div class="ftr2__row">
       <figure class="ftr2__card">
         <div class="ftr2__media">
-          <img src="assets/cards/themes-fan.jpg" alt="Customizable Shopify store themes shown in 3D perspective" />
+          <img src="assets/cards/themes-fan.webp" srcset="assets/cards/themes-fan.webp 1x, assets/cards/themes-fan@2x.webp 2x" loading="lazy" decoding="async" alt="Customizable Shopify store themes shown in 3D perspective" />
           <span class="ftr2__badge">Customizable themes</span>
         </div>
         <figcaption class="ftr2__text">
@@ -34,7 +34,7 @@ document.getElementById("below-hero").innerHTML = `
 
       <figure class="ftr2__card">
         <div class="ftr2__media">
-          <img src="assets/cards/gmv-rewards.png" alt="A sales chart showing $1,000,000 in total sales and +$10,000 in credits, with gold coins" />
+          <img src="assets/cards/gmv-rewards.webp" srcset="assets/cards/gmv-rewards.webp 1x, assets/cards/gmv-rewards@2x.webp 2x" loading="lazy" decoding="async" alt="A sales chart showing $1,000,000 in total sales and +$10,000 in credits, with gold coins" />
           <span class="ftr2__badge">Get rewarded</span>
         </div>
         <figcaption class="ftr2__text">

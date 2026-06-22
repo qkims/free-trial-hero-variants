@@ -221,6 +221,8 @@
         color: #000;
       }
     </style>
+    <link rel="preload" as="image" href="assets/cards/themes-fan.webp" imagesrcset="assets/cards/themes-fan.webp 1x, assets/cards/themes-fan@2x.webp 2x" fetchpriority="high" media="(max-width:768px)" />
+    <link rel="preload" as="image" href="assets/v7-v2/yowie.webp" imagesrcset="assets/v7-v2/yowie.webp 1x, assets/v7-v2/yowie@2x.webp 2x" fetchpriority="high" />
   </head>
   <body>
     <!-- Hero (Variant 7) — the full 1440×673 Figma frame (reference node
@@ -711,14 +713,19 @@
           fi.loading = "eager";
           // First few front faces get high fetch priority for LCP.
           if (i < 3) fi.fetchPriority = "high";
-          fi.src = A + c.img + ".png";
+          else fi.fetchPriority = "low";
+          // Right-sized WebP + density srcset.
+          fi.src = A + c.img + ".webp";
+          fi.srcset = A + c.img + ".webp 1x, " + A + c.img + "@2x.webp 2x";
           front.appendChild(fi);
 
           var bi = new Image();
           bi.alt = "";
           bi.decoding = "async";
-          bi.loading = "eager"; // preload so the flip never reveals a blank face
-          bi.src = A + c.img + "-hover.png";
+          bi.loading = "lazy"; // hover back-face: only needed on flip
+          bi.fetchPriority = "low";
+          bi.src = A + c.img + "-hover.webp";
+          bi.srcset = A + c.img + "-hover.webp 1x, " + A + c.img + "-hover@2x.webp 2x";
           back.appendChild(bi);
 
           flip.appendChild(front);

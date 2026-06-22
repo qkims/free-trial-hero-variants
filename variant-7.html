@@ -464,6 +464,7 @@
       }
     
 }</style>
+    <link rel="preload" as="image" href="assets/v7-flow/Image4.webp" imagesrcset="assets/v7-flow/Image4.webp 1x, assets/v7-flow/Image4@2x.webp 2x" fetchpriority="high" />
   </head>
   <body>
     <div class="vp-d">
@@ -1448,11 +1449,15 @@
               // scrolls into view (no pop-in); only the first few front-tier
               // images get high fetch priority for LCP.
               im.loading = "eager";
-              if (t.cls === "d2" && rep === 0 && eager < 3) {
+              if (rep === 0 && (c.img === "Image4.png" || (t.cls === "d2" && eager < 3))) {
                 im.fetchPriority = "high";
                 eager++;
               }
-              im.src = A + encodeURI(c.img);
+              var v7b = c.img.replace(/\.png$/, "");
+              var v7s1 = A + encodeURI(v7b + ".webp");
+              var v7s2 = A + encodeURI(v7b + "@2x.webp");
+              im.src = v7s1;
+              im.srcset = v7s1 + " 1x, " + v7s2 + " 2x";
               card.appendChild(im);
               flow.appendChild(card);
             }
@@ -1591,11 +1596,15 @@
               // scrolls into view (no pop-in); only the first few front-tier
               // images get high fetch priority for LCP.
               im.loading = "eager";
-              if (t.cls === "d2" && rep === 0 && eager < 3) {
+              if (rep === 0 && (c.img === "Image4.png" || (t.cls === "d2" && eager < 3))) {
                 im.fetchPriority = "high";
                 eager++;
               }
-              im.src = A + encodeURI(c.img);
+              var v7b = c.img.replace(/\.png$/, "");
+              var v7s1 = A + encodeURI(v7b + ".webp");
+              var v7s2 = A + encodeURI(v7b + "@2x.webp");
+              im.src = v7s1;
+              im.srcset = v7s1 + " 1x, " + v7s2 + " 2x";
               card.appendChild(im);
               flow.appendChild(card);
             }

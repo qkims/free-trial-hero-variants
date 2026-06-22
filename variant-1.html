@@ -470,6 +470,8 @@
       }
     
 }</style>
+    <link rel="preload" as="image" href="assets/mosaic/v3/img2.webp?v=6" imagesrcset="assets/mosaic/v3/img2.webp?v=6 1x, assets/mosaic/v3/img2@2x.webp?v=6 2x" fetchpriority="high" media="(min-width:769px)" />
+    <link rel="preload" as="image" href="assets/mosaic/v3/img1.webp?v=6" imagesrcset="assets/mosaic/v3/img1.webp?v=6 1x, assets/mosaic/v3/img1@2x.webp?v=6 2x" fetchpriority="high" media="(max-width:768px)" />
   </head>
   <body>
     <div class="vp-d">
@@ -1361,19 +1363,27 @@
       ];
 
       const px = (n) => `calc(${(n * K).toFixed(3)}*var(--u))`;
+      // Right-sized WebP + density srcset; LCP tile (img2) gets high priority, the
+      // rest low, and hover overlays load lazily (only needed on interaction).
+      const A = "assets/mosaic/v3/", V = "?v=6";
+      const W = (f) => A + f.replace(".png", ".webp") + V;
+      const W2 = (f) => A + f.replace(".png", "@2x.webp") + V;
+      const SS = (f) => `${W(f)} 1x, ${W2(f)} 2x`;
+      const LCP = "img2.png";
       const tileHTML = PHOTOS.map(([file, x, y, w, h, hover, name]) => {
         const box =
           `left:${px(x)};top:${px(y)};width:${px(w)};height:${px(h)}`;
+        const fp = file === LCP ? "high" : "low";
         if (hover) {
           return (
             `<div class="v1-ph v1-hoverph" style="${box}">` +
-            `<img class="v1-hoverph__base" src="assets/mosaic/v3/${file}?v=5" alt="" />` +
-            `<img class="v1-hoverph__top" src="assets/mosaic/v3/${hover}?v=5" alt="" />` +
+            `<img class="v1-hoverph__base" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
+            `<img class="v1-hoverph__top" src="${W(hover)}" srcset="${SS(hover)}" alt="" decoding="async" loading="lazy" fetchpriority="low" />` +
             `<span class="v1-hoverph__name">${name}</span>` +
             `</div>`
           );
         }
-        return `<img class="v1-ph" src="assets/mosaic/v3/${file}?v=5" alt="" style="${box}" />`;
+        return `<img class="v1-ph" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" style="${box}" />`;
       }).join("");
 
       // Two copies side-by-side -> wrapping by one tile width loops seamlessly.
@@ -1485,18 +1495,24 @@
       ];
 
       const mu = (n) => `calc(${n}*var(--mu))`;
+      const A = "assets/mosaic/v3/", V = "?v=6";
+      const W = (f) => A + f.replace(".png", ".webp") + V;
+      const W2 = (f) => A + f.replace(".png", "@2x.webp") + V;
+      const SS = (f) => `${W(f)} 1x, ${W2(f)} 2x`;
+      const LCP = "img1.png"; // mobile LCP tile
       const tileHTML = PHOTOS.map(([file, x, y, w, h, hover, name]) => {
         const box = `left:${mu(x)};top:${mu(y)};width:${mu(w)};height:${mu(h)}`;
+        const fp = file === LCP ? "high" : "low";
         if (hover) {
           return (
             `<div class="m1-ph m1-hoverph" style="${box}">` +
-            `<img class="m1-hoverph__base" src="assets/mosaic/v3/${file}?v=4" alt="" />` +
-            `<img class="m1-hoverph__top" src="assets/mosaic/v3/${hover}?v=4" alt="" />` +
+            `<img class="m1-hoverph__base" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
+            `<img class="m1-hoverph__top" src="${W(hover)}" srcset="${SS(hover)}" alt="" decoding="async" loading="lazy" fetchpriority="low" />` +
             `<span class="m1-hoverph__name">${name}</span>` +
             `</div>`
           );
         }
-        return `<img class="m1-ph" src="assets/mosaic/v3/${file}?v=4" alt="" style="${box}" />`;
+        return `<img class="m1-ph" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" style="${box}" />`;
       }).join("");
 
       const track = document.getElementById("m1-track");

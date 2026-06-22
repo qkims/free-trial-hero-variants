@@ -443,6 +443,8 @@
       }
     
 }</style>
+    <link rel="preload" as="image" href="assets/fan/fan09.webp" imagesrcset="assets/fan/fan09.webp 1x, assets/fan/fan09@2x.webp 2x" fetchpriority="high" media="(min-width:769px)" />
+    <link rel="preload" as="image" href="assets/fan/fan02.webp" imagesrcset="assets/fan/fan02.webp 1x, assets/fan/fan02@2x.webp 2x" fetchpriority="high" media="(max-width:768px)" />
   </head>
   <body>
     <div class="vp-d">
@@ -1334,17 +1336,21 @@
       // back into the visible arc — that's the repeat we're avoiding here.)
       const N = 20;
       const STEP = 360 / N; // 18°
+      // Right-sized WebP + density srcset; LCP card (fan09) high priority, hovers lazy.
+      const W = (f) => "assets/fan/" + f.replace(".png", ".webp");
+      const SS = (f) => `${W(f)} 1x, assets/fan/${f.replace(".png", "@2x.webp")} 2x`;
       let html = "";
       for (let i = 0; i < N; i++) {
         const angle = i * STEP;
         const p = PHOTOS[i % PHOTOS.length];
         const people = !!p.hover;
+        const fp = p.img === "fan09.png" ? "high" : "low";
         html +=
           `<div class="v2-card${people ? " is-people" : ""}" style="--a:${angle}deg" data-a="${angle}">` +
           `<div class="v2-card__inner">` +
-          `<img src="assets/fan/${p.img}" alt="" />` +
+          `<img src="${W(p.img)}" srcset="${SS(p.img)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
           (people
-            ? `<img class="v2-card__hover" src="assets/fan/${p.hover}" alt="" loading="eager" />` +
+            ? `<img class="v2-card__hover" src="${W(p.hover)}" srcset="${SS(p.hover)}" alt="" decoding="async" loading="lazy" fetchpriority="low" />` +
               `<span class="v2-card__name">${p.name}</span>`
             : "") +
           `</div>` +
@@ -1516,13 +1522,16 @@
       // photos too far apart across the top.
       const N = 30;
       const STEP = 360 / N; // 12° — the tighter spacing that read best
+      const W = (f) => "assets/fan/" + f.replace(".png", ".webp");
+      const SS = (f) => `${W(f)} 1x, assets/fan/${f.replace(".png", "@2x.webp")} 2x`;
       let html = "";
       for (let i = 0; i < N; i++) {
         const angle = i * STEP;
         const file = WHEEL_PHOTOS[i % WHEEL_PHOTOS.length];
+        const fp = file === "fan02.png" ? "high" : "low";
         html +=
           `<div class="m2-card" style="--a:${angle}deg">` +
-          `<img src="assets/fan/${file}" alt="" />` +
+          `<img src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
           `</div>`;
       }
       const wheel = document.getElementById("m2-wheel");
