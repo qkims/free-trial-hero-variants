@@ -150,6 +150,7 @@
             rgba(0, 0, 0, 0.42),
           0 calc(8 * var(--u)) calc(18 * var(--u)) rgba(0, 0, 0, 0.1);
       }
+      picture { display: contents; }
       .v7-card img {
         width: 100%;
         height: 100%;
@@ -464,7 +465,7 @@
       }
     
 }</style>
-    <link rel="preload" as="image" href="assets/v7-flow/Image4.webp" imagesrcset="assets/v7-flow/Image4.webp 1x, assets/v7-flow/Image4@2x.webp 2x" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/avif" href="assets/v7-flow/Image4.avif" imagesrcset="assets/v7-flow/Image4.avif 1x, assets/v7-flow/Image4@2x.avif 2x" fetchpriority="high" />
   </head>
   <body>
     <div class="vp-d">
@@ -1454,11 +1455,25 @@
                 eager++;
               }
               var v7b = c.img.replace(/\.png$/, "");
-              var v7s1 = A + encodeURI(v7b + ".webp");
-              var v7s2 = A + encodeURI(v7b + "@2x.webp");
-              im.src = v7s1;
-              im.srcset = v7s1 + " 1x, " + v7s2 + " 2x";
-              card.appendChild(im);
+              var v7w1 = A + encodeURI(v7b + ".webp");
+              var v7w2 = A + encodeURI(v7b + "@2x.webp");
+              var v7a1 = A + encodeURI(v7b + ".avif");
+              var v7a2 = A + encodeURI(v7b + "@2x.avif");
+              im.src = v7w1;
+              im.srcset = v7w1 + " 1x, " + v7w2 + " 2x";
+              // AVIF with WebP fallback via <picture>; picture{display:contents}
+              // keeps the <img> as the laid-out element so .v7-card img CSS holds.
+              var pic = document.createElement("picture");
+              var sa = document.createElement("source");
+              sa.type = "image/avif";
+              sa.srcset = v7a1 + " 1x, " + v7a2 + " 2x";
+              var sw = document.createElement("source");
+              sw.type = "image/webp";
+              sw.srcset = v7w1 + " 1x, " + v7w2 + " 2x";
+              pic.appendChild(sa);
+              pic.appendChild(sw);
+              pic.appendChild(im);
+              card.appendChild(pic);
               flow.appendChild(card);
             }
           });
@@ -1601,11 +1616,25 @@
                 eager++;
               }
               var v7b = c.img.replace(/\.png$/, "");
-              var v7s1 = A + encodeURI(v7b + ".webp");
-              var v7s2 = A + encodeURI(v7b + "@2x.webp");
-              im.src = v7s1;
-              im.srcset = v7s1 + " 1x, " + v7s2 + " 2x";
-              card.appendChild(im);
+              var v7w1 = A + encodeURI(v7b + ".webp");
+              var v7w2 = A + encodeURI(v7b + "@2x.webp");
+              var v7a1 = A + encodeURI(v7b + ".avif");
+              var v7a2 = A + encodeURI(v7b + "@2x.avif");
+              im.src = v7w1;
+              im.srcset = v7w1 + " 1x, " + v7w2 + " 2x";
+              // AVIF with WebP fallback via <picture>; picture{display:contents}
+              // keeps the <img> as the laid-out element so .v7-card img CSS holds.
+              var pic = document.createElement("picture");
+              var sa = document.createElement("source");
+              sa.type = "image/avif";
+              sa.srcset = v7a1 + " 1x, " + v7a2 + " 2x";
+              var sw = document.createElement("source");
+              sw.type = "image/webp";
+              sw.srcset = v7w1 + " 1x, " + v7w2 + " 2x";
+              pic.appendChild(sa);
+              pic.appendChild(sw);
+              pic.appendChild(im);
+              card.appendChild(pic);
               flow.appendChild(card);
             }
           });

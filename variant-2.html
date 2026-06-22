@@ -131,6 +131,7 @@
         will-change: transform;
       }
 
+      picture { display: contents; }
       .v2-card img {
         position: absolute;
         inset: 0;
@@ -443,8 +444,8 @@
       }
     
 }</style>
-    <link rel="preload" as="image" href="assets/fan/fan09.webp" imagesrcset="assets/fan/fan09.webp 1x, assets/fan/fan09@2x.webp 2x" fetchpriority="high" media="(min-width:769px)" />
-    <link rel="preload" as="image" href="assets/fan/fan02.webp" imagesrcset="assets/fan/fan02.webp 1x, assets/fan/fan02@2x.webp 2x" fetchpriority="high" media="(max-width:768px)" />
+    <link rel="preload" as="image" type="image/avif" href="assets/fan/fan09.avif" imagesrcset="assets/fan/fan09.avif 1x, assets/fan/fan09@2x.avif 2x" fetchpriority="high" media="(min-width:769px)" />
+    <link rel="preload" as="image" type="image/avif" href="assets/fan/fan02.avif" imagesrcset="assets/fan/fan02.avif 1x, assets/fan/fan02@2x.avif 2x" fetchpriority="high" media="(max-width:768px)" />
   </head>
   <body>
     <div class="vp-d">
@@ -1336,9 +1337,15 @@
       // back into the visible arc — that's the repeat we're avoiding here.)
       const N = 20;
       const STEP = 360 / N; // 18°
-      // Right-sized WebP + density srcset; LCP card (fan09) high priority, hovers lazy.
-      const W = (f) => "assets/fan/" + f.replace(".png", ".webp");
-      const SS = (f) => `${W(f)} 1x, assets/fan/${f.replace(".png", "@2x.webp")} 2x`;
+      // AVIF (WebP fallback) + density srcset; LCP card (fan09) high priority, hovers lazy.
+      const url = (f, ext) => "assets/fan/" + f.replace(".png", ext);
+      const SS = (f, e) => `${url(f, e)} 1x, ${url(f, "@2x" + e)} 2x`;
+      const PIC = (f, cls, fp, lazy) =>
+        `<picture>` +
+        `<source type="image/avif" srcset="${SS(f, ".avif")}" />` +
+        `<source type="image/webp" srcset="${SS(f, ".webp")}" />` +
+        `<img${cls ? ` class="${cls}"` : ""} src="${url(f, ".webp")}" alt="" decoding="async" loading="${lazy ? "lazy" : "eager"}" fetchpriority="${fp}" />` +
+        `</picture>`;
       let html = "";
       for (let i = 0; i < N; i++) {
         const angle = i * STEP;
@@ -1348,9 +1355,9 @@
         html +=
           `<div class="v2-card${people ? " is-people" : ""}" style="--a:${angle}deg" data-a="${angle}">` +
           `<div class="v2-card__inner">` +
-          `<img src="${W(p.img)}" srcset="${SS(p.img)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
+          PIC(p.img, "", fp, false) +
           (people
-            ? `<img class="v2-card__hover" src="${W(p.hover)}" srcset="${SS(p.hover)}" alt="" decoding="async" loading="lazy" fetchpriority="low" />` +
+            ? PIC(p.hover, "v2-card__hover", "low", true) +
               `<span class="v2-card__name">${p.name}</span>`
             : "") +
           `</div>` +
@@ -1522,8 +1529,14 @@
       // photos too far apart across the top.
       const N = 30;
       const STEP = 360 / N; // 12° — the tighter spacing that read best
-      const W = (f) => "assets/fan/" + f.replace(".png", ".webp");
-      const SS = (f) => `${W(f)} 1x, assets/fan/${f.replace(".png", "@2x.webp")} 2x`;
+      const url = (f, ext) => "assets/fan/" + f.replace(".png", ext);
+      const SS = (f, e) => `${url(f, e)} 1x, ${url(f, "@2x" + e)} 2x`;
+      const PIC = (f, fp) =>
+        `<picture>` +
+        `<source type="image/avif" srcset="${SS(f, ".avif")}" />` +
+        `<source type="image/webp" srcset="${SS(f, ".webp")}" />` +
+        `<img src="${url(f, ".webp")}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
+        `</picture>`;
       let html = "";
       for (let i = 0; i < N; i++) {
         const angle = i * STEP;
@@ -1531,7 +1544,7 @@
         const fp = file === "fan02.png" ? "high" : "low";
         html +=
           `<div class="m2-card" style="--a:${angle}deg">` +
-          `<img src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
+          PIC(file, fp) +
           `</div>`;
       }
       const wheel = document.getElementById("m2-wheel");

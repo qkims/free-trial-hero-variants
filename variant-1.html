@@ -157,6 +157,7 @@
         height: 100%;
       }
 
+      picture { display: contents; }
       .v1-ph {
         position: absolute;
         object-fit: cover;
@@ -470,8 +471,8 @@
       }
     
 }</style>
-    <link rel="preload" as="image" href="assets/mosaic/v3/img2.webp?v=6" imagesrcset="assets/mosaic/v3/img2.webp?v=6 1x, assets/mosaic/v3/img2@2x.webp?v=6 2x" fetchpriority="high" media="(min-width:769px)" />
-    <link rel="preload" as="image" href="assets/mosaic/v3/img1.webp?v=6" imagesrcset="assets/mosaic/v3/img1.webp?v=6 1x, assets/mosaic/v3/img1@2x.webp?v=6 2x" fetchpriority="high" media="(max-width:768px)" />
+    <link rel="preload" as="image" type="image/avif" href="assets/mosaic/v3/img2.avif?v=6" imagesrcset="assets/mosaic/v3/img2.avif?v=6 1x, assets/mosaic/v3/img2@2x.avif?v=6 2x" fetchpriority="high" media="(min-width:769px)" />
+    <link rel="preload" as="image" type="image/avif" href="assets/mosaic/v3/img1.avif?v=6" imagesrcset="assets/mosaic/v3/img1.avif?v=6 1x, assets/mosaic/v3/img1@2x.avif?v=6 2x" fetchpriority="high" media="(max-width:768px)" />
   </head>
   <body>
     <div class="vp-d">
@@ -1363,12 +1364,17 @@
       ];
 
       const px = (n) => `calc(${(n * K).toFixed(3)}*var(--u))`;
-      // Right-sized WebP + density srcset; LCP tile (img2) gets high priority, the
-      // rest low, and hover overlays load lazily (only needed on interaction).
+      // AVIF (WebP fallback) + density srcset; LCP tile (img2) high priority, rest
+      // low, hover overlays lazy. picture{display:contents} keeps <img> the laid-out box.
       const A = "assets/mosaic/v3/", V = "?v=6";
-      const W = (f) => A + f.replace(".png", ".webp") + V;
-      const W2 = (f) => A + f.replace(".png", "@2x.webp") + V;
-      const SS = (f) => `${W(f)} 1x, ${W2(f)} 2x`;
+      const url = (f, ext) => A + f.replace(".png", ext) + V;
+      const SS = (f, e) => `${url(f, e)} 1x, ${url(f, "@2x" + e)} 2x`;
+      const PIC = (f, cls, fp, lazy, style) =>
+        `<picture>` +
+        `<source type="image/avif" srcset="${SS(f, ".avif")}" />` +
+        `<source type="image/webp" srcset="${SS(f, ".webp")}" />` +
+        `<img class="${cls}" src="${url(f, ".webp")}" alt="" decoding="async" loading="${lazy ? "lazy" : "eager"}" fetchpriority="${fp}"${style ? ` style="${style}"` : ""} />` +
+        `</picture>`;
       const LCP = "img2.png";
       const tileHTML = PHOTOS.map(([file, x, y, w, h, hover, name]) => {
         const box =
@@ -1377,13 +1383,13 @@
         if (hover) {
           return (
             `<div class="v1-ph v1-hoverph" style="${box}">` +
-            `<img class="v1-hoverph__base" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
-            `<img class="v1-hoverph__top" src="${W(hover)}" srcset="${SS(hover)}" alt="" decoding="async" loading="lazy" fetchpriority="low" />` +
+            PIC(file, "v1-hoverph__base", fp, false) +
+            PIC(hover, "v1-hoverph__top", "low", true) +
             `<span class="v1-hoverph__name">${name}</span>` +
             `</div>`
           );
         }
-        return `<img class="v1-ph" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" style="${box}" />`;
+        return PIC(file, "v1-ph", fp, false, box);
       }).join("");
 
       // Two copies side-by-side -> wrapping by one tile width loops seamlessly.
@@ -1496,9 +1502,14 @@
 
       const mu = (n) => `calc(${n}*var(--mu))`;
       const A = "assets/mosaic/v3/", V = "?v=6";
-      const W = (f) => A + f.replace(".png", ".webp") + V;
-      const W2 = (f) => A + f.replace(".png", "@2x.webp") + V;
-      const SS = (f) => `${W(f)} 1x, ${W2(f)} 2x`;
+      const url = (f, ext) => A + f.replace(".png", ext) + V;
+      const SS = (f, e) => `${url(f, e)} 1x, ${url(f, "@2x" + e)} 2x`;
+      const PIC = (f, cls, fp, lazy, style) =>
+        `<picture>` +
+        `<source type="image/avif" srcset="${SS(f, ".avif")}" />` +
+        `<source type="image/webp" srcset="${SS(f, ".webp")}" />` +
+        `<img class="${cls}" src="${url(f, ".webp")}" alt="" decoding="async" loading="${lazy ? "lazy" : "eager"}" fetchpriority="${fp}"${style ? ` style="${style}"` : ""} />` +
+        `</picture>`;
       const LCP = "img1.png"; // mobile LCP tile
       const tileHTML = PHOTOS.map(([file, x, y, w, h, hover, name]) => {
         const box = `left:${mu(x)};top:${mu(y)};width:${mu(w)};height:${mu(h)}`;
@@ -1506,13 +1517,13 @@
         if (hover) {
           return (
             `<div class="m1-ph m1-hoverph" style="${box}">` +
-            `<img class="m1-hoverph__base" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" />` +
-            `<img class="m1-hoverph__top" src="${W(hover)}" srcset="${SS(hover)}" alt="" decoding="async" loading="lazy" fetchpriority="low" />` +
+            PIC(file, "m1-hoverph__base", fp, false) +
+            PIC(hover, "m1-hoverph__top", "low", true) +
             `<span class="m1-hoverph__name">${name}</span>` +
             `</div>`
           );
         }
-        return `<img class="m1-ph" src="${W(file)}" srcset="${SS(file)}" alt="" decoding="async" loading="eager" fetchpriority="${fp}" style="${box}" />`;
+        return PIC(file, "m1-ph", fp, false, box);
       }).join("");
 
       const track = document.getElementById("m1-track");

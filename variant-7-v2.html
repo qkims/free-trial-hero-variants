@@ -134,6 +134,7 @@
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
       }
+      picture { display: contents; }
       .v7-face img {
         width: 100%;
         height: 100%;
@@ -221,8 +222,8 @@
         color: #000;
       }
     </style>
-    <link rel="preload" as="image" href="assets/cards/themes-fan.webp" imagesrcset="assets/cards/themes-fan.webp 1x, assets/cards/themes-fan@2x.webp 2x" fetchpriority="high" media="(max-width:768px)" />
-    <link rel="preload" as="image" href="assets/v7-v2/yowie.webp" imagesrcset="assets/v7-v2/yowie.webp 1x, assets/v7-v2/yowie@2x.webp 2x" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/avif" href="assets/cards/themes-fan.avif" imagesrcset="assets/cards/themes-fan.avif 1x, assets/cards/themes-fan@2x.avif 2x" fetchpriority="high" media="(max-width:768px)" />
+    <link rel="preload" as="image" type="image/avif" href="assets/v7-v2/yowie.avif" imagesrcset="assets/v7-v2/yowie.avif 1x, assets/v7-v2/yowie@2x.avif 2x" fetchpriority="high" />
   </head>
   <body>
     <!-- Hero (Variant 7) — the full 1440×673 Figma frame (reference node
@@ -707,6 +708,22 @@
           var back = document.createElement("div");
           back.className = "v7-face back";
 
+          // AVIF with WebP fallback via <picture>; picture{display:contents}
+          // keeps each <img> as the laid-out face element so existing CSS holds.
+          function v7pic(im, stem) {
+            var pic = document.createElement("picture");
+            var sa = document.createElement("source");
+            sa.type = "image/avif";
+            sa.srcset = A + stem + ".avif 1x, " + A + stem + "@2x.avif 2x";
+            var sw = document.createElement("source");
+            sw.type = "image/webp";
+            sw.srcset = A + stem + ".webp 1x, " + A + stem + "@2x.webp 2x";
+            pic.appendChild(sa);
+            pic.appendChild(sw);
+            pic.appendChild(im);
+            return pic;
+          }
+
           var fi = new Image();
           fi.alt = "";
           fi.decoding = "async";
@@ -714,10 +731,9 @@
           // First few front faces get high fetch priority for LCP.
           if (i < 3) fi.fetchPriority = "high";
           else fi.fetchPriority = "low";
-          // Right-sized WebP + density srcset.
           fi.src = A + c.img + ".webp";
           fi.srcset = A + c.img + ".webp 1x, " + A + c.img + "@2x.webp 2x";
-          front.appendChild(fi);
+          front.appendChild(v7pic(fi, c.img));
 
           var bi = new Image();
           bi.alt = "";
@@ -726,7 +742,7 @@
           bi.fetchPriority = "low";
           bi.src = A + c.img + "-hover.webp";
           bi.srcset = A + c.img + "-hover.webp 1x, " + A + c.img + "-hover@2x.webp 2x";
-          back.appendChild(bi);
+          back.appendChild(v7pic(bi, c.img + "-hover"));
 
           flip.appendChild(front);
           flip.appendChild(back);

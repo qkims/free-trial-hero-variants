@@ -48,7 +48,11 @@
       '<div class="ftr2__row">' +
       '<figure class="ftr2__card">' +
       '<div class="ftr2__media">' +
-      '<img src="assets/cards/themes-fan.webp" srcset="assets/cards/themes-fan.webp 1x, assets/cards/themes-fan@2x.webp 2x" loading="lazy" decoding="async" alt="Customizable Shopify store themes shown in 3D perspective" />' +
+      '<picture>' +
+      '<source type="image/avif" srcset="assets/cards/themes-fan.avif 1x, assets/cards/themes-fan@2x.avif 2x" />' +
+      '<source type="image/webp" srcset="assets/cards/themes-fan.webp 1x, assets/cards/themes-fan@2x.webp 2x" />' +
+      '<img src="assets/cards/themes-fan.webp" loading="lazy" decoding="async" alt="Customizable Shopify store themes shown in 3D perspective" />' +
+      '</picture>' +
       '<span class="ftr2__badge">Customizable themes</span>' +
       "</div>" +
       '<figcaption class="ftr2__text">' +
@@ -58,7 +62,11 @@
       "</figure>" +
       '<figure class="ftr2__card">' +
       '<div class="ftr2__media">' +
-      '<img src="assets/cards/gmv-rewards.webp" srcset="assets/cards/gmv-rewards.webp 1x, assets/cards/gmv-rewards@2x.webp 2x" loading="lazy" decoding="async" alt="A sales chart showing total sales and credits, with gold coins" />' +
+      '<picture>' +
+      '<source type="image/avif" srcset="assets/cards/gmv-rewards.avif 1x, assets/cards/gmv-rewards@2x.avif 2x" />' +
+      '<source type="image/webp" srcset="assets/cards/gmv-rewards.webp 1x, assets/cards/gmv-rewards@2x.webp 2x" />' +
+      '<img src="assets/cards/gmv-rewards.webp" loading="lazy" decoding="async" alt="A sales chart showing total sales and credits, with gold coins" />' +
+      '</picture>' +
       '<span class="ftr2__badge">Get rewarded</span>' +
       "</div>" +
       '<figcaption class="ftr2__text">' +
