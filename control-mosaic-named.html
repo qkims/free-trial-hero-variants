@@ -409,8 +409,9 @@
       .mzc-cell:hover .mzc-name {
         opacity: 1;
       }
-      /* Pause the scrolling row on hover so the name can be read. */
-      .mzc-row:hover .mzc-track {
+      /* Pause the row only while hovering a tile that has a name to reveal
+         (a .mzc-cell) — plain tiles keep scrolling. */
+      .mzc-track:has(.mzc-cell:hover) {
         animation-play-state: paused;
       }
       @media (max-width: 480px) {
