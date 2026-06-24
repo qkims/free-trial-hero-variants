@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Variant 1 — marquee mosaic</title>
+    <title>Cascade Out — all columns rise together (upward)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -51,13 +51,16 @@
       .v1-header .shopify-logo .shopify-decorative-2 path { stroke: #fff !important; }
 
       /* ----------------------------------------------------------------
-       Variant 1 hero — Figma node 1:46235
-       Centered headline + CTA on white, with a full-bleed mosaic band
-       of merchant photos beneath that marquees right -> left.
+       CASCADE — a "my pass" on the Marquee (variant-1).
+       The marquee turned 90°: instead of horizontal rows, the field is a
+       set of VERTICAL columns of merchant tiles streaming up/down at varied
+       speeds (adjacent columns oppose). The signup is no longer floating copy
+       on a wash — it's a discrete frosted-glass PANEL centered over the
+       living gallery wall, reading like a premium auth screen. Same 26
+       Dynamic-Mosaic tiles, same per-tile hover egg + logo-wave, same rAF
+       engine (axis swapped to Y), same AVIF/preload LCP discipline.
 
-       Authored at 1440 x 997. The band is reconstructed at exact comp
-       coordinates and expressed in cqw (--u == one design px) so it
-       scales with the viewport and the mosaic geometry stays locked.
+       Authored at 1440 x 997; everything in cqw (--u == one design px).
     ---------------------------------------------------------------- */
       .v1-hero {
         position: relative;
@@ -88,20 +91,42 @@
         );
       }
 
-      /* ---- Centered heading group — floats over the full-bleed image field,
-         vertically + horizontally centered, above the scrim (z-index 3). ---- */
+      /* ---- Frosted-glass signup PANEL — a discrete auth card centered over
+         the vertical gallery wall (above the scrim, z-index 3). Legibility is
+         guaranteed STRUCTURALLY: the panel is near-opaque by default (the solid
+         fallback below), and the blur is layered on only as a finishing gloss
+         where the browser supports it. The black signup-card inside carries the
+         real CTA contrast regardless of what scrolls behind. ---- */
       .v1-heading {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: calc(1174 * var(--u));
+        width: calc(556 * var(--u));
         z-index: 3;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: calc(24 * var(--u));
+        gap: calc(28 * var(--u));
         text-align: center;
+        padding: calc(52 * var(--u)) calc(48 * var(--u)) calc(44 * var(--u));
+        border-radius: calc(34 * var(--u));
+        /* Default = near-opaque white plate (the legibility floor). */
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow:
+          0 calc(30 * var(--u)) calc(72 * var(--u)) rgba(0, 0, 0, 0.2),
+          0 calc(2 * var(--u)) calc(10 * var(--u)) rgba(0, 0, 0, 0.08);
+      }
+      /* Glass gloss only where supported — slightly lighter alpha + blur over
+         the moving columns. Blur capped at 22px (compositor cost over 5 live
+         columns); never applied to anything but this one static panel. */
+      @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .v1-heading {
+          background: rgba(255, 255, 255, 0.7);
+          -webkit-backdrop-filter: blur(22px) saturate(140%);
+          backdrop-filter: blur(22px) saturate(140%);
+        }
       }
       /* The heading is centered via translate(-50%,-50%), so the shared `ft-rise`
          entrance would clobber that offset. Use a v1-scoped keyframe that keeps
@@ -159,66 +184,74 @@
 
       /* Email field is the shared .signup-card from styles.css (node 207:6658). */
 
-      /* ---- Full-bleed image field ----
-         Three horizontal marquee rows fill the whole hero top-to-bottom. Each
-         row scrolls independently (alternating direction, see JS); adjacent
-         rows drift opposite ways for depth. The heading group + scrim float on
-         top (z 2/3). */
+      /* ---- Full-bleed image field — VERTICAL columns ----
+         Five columns fill the hero left-to-right. Each column scrolls
+         independently up/down (adjacent columns oppose, see JS) — the marquee
+         rotated 90°. Tiles are WIDTH-driven (width:100%, height by aspect) so
+         they stack into a portrait column. The panel + scrim float on top
+         (z 2/3). A subtle per-column opacity veil (set inline on .v1-row in JS)
+         pushes the outer columns back for a shallow depth read. */
       .v1-field {
         position: absolute;
         inset: 0;
         z-index: 0;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: calc(14 * var(--u));
         background: #ebebeb;
       }
       .v1-row {
         position: relative;
         flex: 1 1 0;
-        min-height: 0;
+        min-width: 0;
         overflow: hidden;
       }
       .v1-track {
         position: absolute;
         top: 0;
         left: 0;
-        height: 100%;
+        width: 100%;
         display: flex;
+        flex-direction: column;
         align-items: stretch;
-        width: max-content;
+        height: max-content;
         will-change: transform; /* JS-driven drift + parallax — see script */
       }
 
-      /* Soft white scrim behind the heading so the light headline stays
-         legible over the photos. */
+      /* Depth field: darken the corners a touch (columns recede) and lay a soft
+         white halo right behind the centered panel so dark copy stays crisp. */
       .v1-scrim {
         position: absolute;
         inset: 0;
         z-index: 1;
         pointer-events: none;
-        background: radial-gradient(
-          ellipse 58% 56% at 50% 50%,
-          rgba(255, 255, 255, 0.94) 0%,
-          rgba(255, 255, 255, 0.78) 36%,
-          rgba(255, 255, 255, 0) 72%
-        );
+        background:
+          radial-gradient(
+            ellipse 70% 66% at 50% 50%,
+            rgba(0, 0, 0, 0) 52%,
+            rgba(0, 0, 0, 0.18) 100%
+          ),
+          radial-gradient(
+            ellipse 40% 42% at 50% 50%,
+            rgba(255, 255, 255, 0.5) 0%,
+            rgba(255, 255, 255, 0) 72%
+          );
       }
 
       picture { display: contents; }
-      /* Plain (non-hover) tile: sized by its own aspect at row height. */
+      /* Plain (non-hover) tile: full column width, height by its own aspect. */
       .v1-ph {
-        height: 100%;
-        width: auto;
+        width: 100%;
+        height: auto;
         flex: none;
         display: block;
-        margin-right: calc(14 * var(--u));
+        margin-bottom: calc(14 * var(--u));
         border-radius: calc(20 * var(--u));
         object-fit: cover;
       }
 
       /* ---- Easter egg: clicking the Shopify logo sends a "wave" rippling
-         left→right across every tile (per-tile delay set inline as --wd). ---- */
+         top→bottom down the columns (per-tile delay set inline as --wd). ---- */
       @keyframes v1-pop {
         0%,
         100% {
@@ -243,18 +276,18 @@
          freezes while hovering — see the freeze logic in the JS engine. */
       .v1-hoverph {
         position: relative;
-        height: 100%;
+        width: 100%;
         flex: none;
-        margin-right: calc(14 * var(--u));
+        margin-bottom: calc(14 * var(--u));
         border-radius: calc(20 * var(--u));
         overflow: hidden; /* clip the stacked photos to the corners */
         cursor: pointer;
       }
-      /* The base image is in normal flow at row height — its aspect ratio sets
-         the cell's width (so it slots into the flex row like a plain tile). */
+      /* The base image is in normal flow at column width — its aspect ratio sets
+         the cell's height (so it stacks into the column like a plain tile). */
       .v1-hoverph__base {
-        height: 100%;
-        width: auto;
+        width: 100%;
+        height: auto;
         display: block;
         object-fit: cover;
         transition: opacity 0.5s ease;
@@ -482,41 +515,36 @@
          Same mosaic + engine as desktop, scaled down to the mobile band
          height. The collage is authored in a 2201×475 space (Figma 390:52078),
          so a per-comp-px unit (--mu) maps it into the shorter mobile band. */
-      /* ---- Full-bleed image field (4 rows) ----
-         Mobile mirror of the desktop field: four horizontal marquee rows fill
-         the hero behind the bottom stack, with a pedestal scrim for legibility. */
+      /* ---- Full-bleed image field — 2 VERTICAL columns ----
+         Mobile Cascade: two columns fill the whole hero, drifting up/down behind
+         everything. Only the top ~half is visible; the bottom-anchored white
+         pedestal (.m1-scrim) dissolves the lower portion into solid white where
+         the signup sits — keeping the proven bottom-pedestal legibility while the
+         vertical-column character matches the desktop. */
       .m1-field {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        /* TOP BAND only (not full-bleed): the three marquee rows live entirely
-           ABOVE the signup, ending at ~400u from the hero bottom — leaving a
-           clean white gap (~60u) between the lowest photo and the headline top
-           (~337u). Every row is a clean full row (none sliced by the headline),
-           and the scrim below dissolves only the band's bottom edge into the
-           white pedestal, so the headline rests on solid white with margin. */
-        bottom: calc(400 * var(--u));
+        inset: 0;
         z-index: 0;
         display: flex;
-        flex-direction: column;
-        gap: calc(6 * var(--u));
+        flex-direction: row;
+        gap: calc(8 * var(--u));
         background: #ebebeb;
       }
       .m1-row {
         position: relative;
         flex: 1 1 0;
-        min-height: 0;
+        min-width: 0;
         overflow: hidden;
       }
       .m1-track {
         position: absolute;
         top: 0;
         left: 0;
-        height: 100%;
+        width: 100%;
         display: flex;
+        flex-direction: column;
         align-items: stretch;
-        width: max-content;
+        height: max-content;
         will-change: transform;
       }
       .m1-scrim {
@@ -525,29 +553,26 @@
         right: 0;
         bottom: 0;
         /* A bottom-anchored white pedestal. Solid white backs the whole signup
-           cluster (headline → card → disclaimer) AND the clean gap above it, up
-           to ~400u (= the field's bottom edge; headline top at ~337u, so ~60u of
-           solid white sits between the copy and the lowest photo). Above 400u a
-           short ramp dissolves only the bottom row's lower edge into the white —
-           the fade lives at the band's bottom, not through the copy zone — so the
-           rows read crisp and the headline rests on confident solid white. */
-        height: calc(452 * var(--u));
+           cluster (headline → card → disclaimer) AND a clean gap above it, then a
+           short ramp dissolves the columns into the white. The columns keep
+           scrolling visibly in the top ~46% of the hero above this pedestal. */
+        height: calc(470 * var(--u));
         z-index: 1;
         pointer-events: none;
         background: linear-gradient(
           to top,
           #fff 0%,
-          #fff 88%,
+          #fff 86%,
           rgba(255, 255, 255, 0) 100%
         );
       }
 
       .m1-ph {
-        height: 100%;
-        width: auto;
+        width: 100%;
+        height: auto;
         flex: none;
         display: block;
-        margin-right: calc(10 * var(--u));
+        margin-bottom: calc(8 * var(--u));
         border-radius: calc(16 * var(--u));
         object-fit: cover;
       }
@@ -576,17 +601,17 @@
          (see JS). */
       .m1-hoverph {
         position: relative;
-        height: 100%;
+        width: 100%;
         flex: none;
-        margin-right: calc(10 * var(--u));
+        margin-bottom: calc(8 * var(--u));
         border-radius: calc(16 * var(--u));
         --mu: var(--u); /* hover name uses --mu; keep it defined on the cell */
         overflow: hidden;
         cursor: pointer;
       }
       .m1-hoverph__base {
-        height: 100%;
-        width: auto;
+        width: 100%;
+        height: auto;
         display: block;
         object-fit: cover;
         transition: opacity 0.5s ease;
@@ -1067,13 +1092,15 @@
         </form>
       </div>
 
-      <!-- Full-bleed image field: three independently-scrolling marquee rows. -->
+      <!-- Full-bleed image field: five independently-scrolling vertical columns. -->
       <div class="v1-field" id="v1-field" aria-hidden="true">
         <div class="v1-row"><div class="v1-track" id="v1-row0"></div></div>
         <div class="v1-row"><div class="v1-track" id="v1-row1"></div></div>
         <div class="v1-row"><div class="v1-track" id="v1-row2"></div></div>
+        <div class="v1-row"><div class="v1-track" id="v1-row3"></div></div>
+        <div class="v1-row"><div class="v1-track" id="v1-row4"></div></div>
       </div>
-      <!-- Soft scrim keeps the heading legible over the photos. -->
+      <!-- Depth vignette + halo keeps the panel legible over the photos. -->
       <div class="v1-scrim" aria-hidden="true"></div>
     </section>
 
@@ -1492,7 +1519,7 @@
         </div>
       </div>
 
-      <!-- Full-bleed image field: two independently-scrolling marquee rows. -->
+      <!-- Full-bleed image field: two independently-scrolling vertical columns. -->
       <div class="m1-field" id="m1-field" aria-hidden="true">
         <div class="m1-row"><div class="m1-track" id="m1-row0"></div></div>
         <div class="m1-row"><div class="m1-track" id="m1-row1"></div></div>
@@ -1523,11 +1550,11 @@
     </script>
     <script>if(!window.__VP_MOBILE__){(function(){
 
-      // ---- Full-bleed marquee field (3 rows) ------------------------
-      // The single collage band is replaced by three independently-scrolling
-      // rows that fill the whole hero. Each row is the same 10 merchant photos
-      // in a different order (so nothing lines up vertically), laid out as a
-      // simple flex strip (tile = height:100%, width by aspect). Five photos are
+      // ---- Cascade field: 5 vertical marquee COLUMNS --------------------
+      // The marquee rotated 90°: five columns fill the hero left-to-right, each
+      // scrolling up/down independently (adjacent columns oppose). Tiles are
+      // width-driven (width:100%, height by aspect) so they stack into portrait
+      // columns. Same 26 Dynamic-Mosaic tiles as the Marquee, regrouped 6/5/5/5/5.
       // Every tile is a hover "easter egg" — exactly one reveal kind:
       //   name: "Brand"  -> hover adds a bottom scrim + the merchant/feature name
       //   swap: "FILE"   -> hover crossfades the base photo to a related image
@@ -1561,12 +1588,16 @@
         { f: "IMG-24", name: "Mallard Goods" }, // 24 wooden duck toy
         { f: "Shirt extend 2", name: "Souvenir" }, // 25 patterned shirt
       ];
-      // Per-row orderings (indices into PHOTOS). Three rows; the union covers all
-      // 26 tiles once, each row a different visual mix of photos + UI cards.
+      // Per-column orderings (indices into PHOTOS). Five columns; the union covers
+      // all 26 tiles once (6/5/5/5/5), each column a different mix of merchant
+      // photos + Shopify UI cards. The high-priority LCP tile (IMG-3) sits in an
+      // off-center column so it never out-areas the headline as the LCP element.
       const ORDERS = [
-        [0, 4, 2, 9, 13, 6, 16, 22, 11],
-        [3, 1, 7, 14, 5, 17, 10, 24, 19],
-        [8, 12, 20, 15, 23, 21, 25, 18],
+        [0, 6, 13, 18, 4, 11],
+        [3, 20, 14, 23, 16],
+        [1, 9, 22, 5, 25],
+        [8, 2, 19, 15, 10],
+        [17, 7, 24, 21, 12],
       ];
 
       // AVIF (WebP fallback) + density srcset. picture{display:contents} keeps
@@ -1611,69 +1642,87 @@
         );
       };
 
-      // Three copies of each row's sequence -> seamless loop with parallax slack
-      // on both edges (we always paint the middle copy ± a few px).
+      // Three copies of each column's sequence -> seamless loop with parallax
+      // slack on both edges (we always paint the middle copy ± a few px).
       const buildRow = (order) => {
         const one = order.map((idx, i) => tile(idx, i)).join("");
         return one + one + one;
       };
 
-      const rowEls = [0, 1, 2].map((n) =>
+      const rowEls = [0, 1, 2, 3, 4].map((n) =>
         document.getElementById("v1-row" + n),
       );
       rowEls.forEach((el, n) => (el.innerHTML = buildRow(ORDERS[n])));
 
-      // ---- Engine: per-row drift + cursor parallax + hover freeze ----
+      // Depth veil — outer columns sit a touch back (dimmer) so the wall reads
+      // with shallow depth and the center (behind the panel) stays fullest.
+      const VEIL = [0.88, 0.96, 1, 0.96, 0.88];
+      rowEls.forEach((el, n) => {
+        el.parentElement.style.opacity = VEIL[n];
+      });
+
+      // ---- Engine: per-column vertical drift + cursor parallax + hover freeze ----
       const field = document.getElementById("v1-field");
       const hero = field.closest(".v1-hero");
       const reduce = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
+      // OUTWARD: every column rises together (dir -1 = up), but each at a
+      // distinctly different speed (~2.2x fastest-to-slowest) so the columns
+      // visibly slide at their own pace rather than reading as one block.
+      // Adjacent columns are deliberately far apart in speed for contrast.
       const rows = [
-        { el: rowEls[0], dir: -1, secs: 78 },
-        { el: rowEls[1], dir: +1, secs: 104 },
-        { el: rowEls[2], dir: -1, secs: 66 },
+        { el: rowEls[0], dir: -1, secs: 72 },
+        { el: rowEls[1], dir: -1, secs: 138 },
+        { el: rowEls[2], dir: -1, secs: 100 },
+        { el: rowEls[3], dir: -1, secs: 160 },
+        { el: rowEls[4], dir: -1, secs: 116 },
       ].map((r) => ({
         ...r,
-        base: 0, render: 0, copyW: 0, frozen: false, px: 0,
+        base: 0, render: 0, copyH: 0, frozen: false, py: 0,
       }));
 
       const measure = (r) => {
         // The track holds 3 identical copies, so one copy is a third of it.
-        r.copyW = r.el.scrollWidth / 3 || 0;
+        r.copyH = r.el.scrollHeight / 3 || 0;
       };
       const measureAll = () => rows.forEach(measure);
       measureAll();
       window.addEventListener("resize", measureAll);
-      // Tiles are width:auto, so a row's width isn't final until its images have
-      // loaded — re-measure on each load (and on window load) so the wrap math
-      // uses the true copy width instead of a partial early measurement.
+      // Tiles are width-driven (height:auto), so a column's height isn't final
+      // until its images have loaded AND the column flex width has resolved —
+      // re-measure on each img load, on window load, and on column resize.
       field.querySelectorAll("img").forEach((im) => {
         if (!im.complete) im.addEventListener("load", measureAll, { once: true });
       });
       window.addEventListener("load", measureAll);
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(measureAll);
+        rowEls.forEach((el) => ro.observe(el));
+      }
 
       // Static middle-copy render for reduced-motion users (no drift/parallax).
       if (reduce) {
         rows.forEach((r) => {
-          r.el.style.transform = `translate3d(${-r.copyW}px,0,0)`;
+          r.el.style.transform = `translate3d(0,${-r.copyH}px,0)`;
         });
         return;
       }
 
-      // Cursor parallax: rows lean opposite ways by the pointer's x offset.
-      const AMP = 26; // px of lean at the hero edges
-      let nx = 0; // -0.5 .. 0.5
+      // Cursor parallax: columns lean opposite ways by the pointer's Y offset
+      // (the vertical counterpart of the Marquee's horizontal lean).
+      const AMP = 24; // px of lean at the hero edges
+      let ny = 0; // -0.5 .. 0.5
       if (hero) {
         hero.addEventListener("mousemove", (e) => {
           const b = hero.getBoundingClientRect();
-          nx = (e.clientX - b.left) / b.width - 0.5;
+          ny = (e.clientY - b.top) / b.height - 0.5;
         });
-        hero.addEventListener("mouseleave", () => (nx = 0));
+        hero.addEventListener("mouseleave", () => (ny = 0));
       }
 
-      // Freeze only the hovered tile's own row so its name sits still to read.
+      // Freeze only the hovered tile's own column so its name sits still to read.
       rows.forEach((r) => {
         r.el.querySelectorAll(".v1-hoverph").forEach((el) => {
           el.addEventListener("pointerenter", () => (r.frozen = true));
@@ -1699,18 +1748,18 @@
         const dt = Math.min((t - prev) / 1000, 0.05);
         prev = t;
         for (const r of rows) {
-          if (!r.copyW) measure(r);
-          if (!r.frozen && r.copyW) {
-            r.base += r.dir * (r.copyW / r.secs) * dt;
+          if (!r.copyH) measure(r);
+          if (!r.frozen && r.copyH) {
+            r.base += r.dir * (r.copyH / r.secs) * dt;
           }
           r.render += (r.base - r.render) * 0.12;
-          r.px += (nx * AMP * r.dir - r.px) * 0.08;
-          // Wrap into the middle copy (keep x in ~(-2copyW, -copyW]) so a copy
+          r.py += (ny * AMP * r.dir - r.py) * 0.08;
+          // Wrap into the middle copy (keep y in ~(-2copyH, -copyH]) so a copy
           // of slack sits on each side for the parallax lean.
-          let m = r.copyW ? r.render % r.copyW : 0;
-          if (m > 0) m -= r.copyW;
-          const x = m - r.copyW + r.px;
-          r.el.style.transform = `translate3d(${x}px,0,0)`;
+          let m = r.copyH ? r.render % r.copyH : 0;
+          if (m > 0) m -= r.copyH;
+          const y = m - r.copyH + r.py;
+          r.el.style.transform = `translate3d(0,${y}px,0)`;
         }
         requestAnimationFrame(frame);
       }
@@ -1719,9 +1768,10 @@
 })();}</script>
     <script>if(window.__VP_MOBILE__){(function(){
 
-      // Full-bleed marquee field (4 rows) — mobile mirror of the desktop field.
+      // Cascade field: 2 vertical marquee COLUMNS — mobile mirror of the desktop.
       // Same 26 Dynamic-Mosaic tiles + per-card hover egg (name badge OR a
-      // crossfade to a related image). Four rows in different orders.
+      // crossfade to a related image). Two columns drift up/down behind the
+      // bottom signup pedestal.
       //   name: "Brand"  -> hover scrim + name;  swap: "FILE" -> crossfade
       const PHOTOS = [
         { f: "IMG", name: "Daybreak Coffee" },
@@ -1751,14 +1801,15 @@
         { f: "IMG-24", name: "Mallard Goods" },
         { f: "Shirt extend 2", name: "Souvenir" },
       ];
-      // Three rows; union covers all 26 tiles once (9 / 9 / 8). Each row mixes
-      // merchant photos with 2-3 Shopify UI cards so no row is all one or the other.
-      // (Three full rows read crisply in the upper band, the lowest feathering into
-      // the white pedestal — a fuller composition than the original ~1.5 visible.)
+      // Two columns; union covers all 26 tiles once (13 / 13). Each column mixes
+      // merchant photos with Shopify UI cards. IMG-4 (the preloaded LCP tile)
+      // leads column 1 so it paints near the top of the visible band.
+      // Three full-bleed columns (was two). Narrower tiles read as taller,
+      // more column-like strips and show more imagery above the pedestal.
       const ORDERS = [
         [0, 6, 13, 22, 11, 3, 1, 24, 16],
-        [4, 21, 7, 14, 8, 17, 5, 19, 10],
-        [12, 20, 23, 15, 9, 18, 2, 25],
+        [4, 21, 7, 14, 5, 17, 9, 18, 2],
+        [8, 15, 19, 10, 25, 20, 23, 12],
       ];
 
       const A = "assets/mosaic-dynamic/tiles/", V = "";
@@ -1805,19 +1856,22 @@
       const rowEls = [0, 1, 2].map((n) => document.getElementById("m1-row" + n));
       rowEls.forEach((el, n) => (el.innerHTML = buildRow(ORDERS[n])));
 
-      // ---- Engine: per-row drift + hover freeze (no cursor parallax on touch) -
+      // ---- Engine: per-column vertical drift + hover freeze (no parallax on touch) -
       const field = document.getElementById("m1-field");
       const reduce = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
+      // OUTWARD: all three columns rise together (up), each at a distinctly
+      // different speed (~1.9x fastest-to-slowest) so they visibly slide at
+      // their own pace.
       const rows = [
         { el: rowEls[0], dir: -1, secs: 80 },
-        { el: rowEls[1], dir: +1, secs: 100 },
-        { el: rowEls[2], dir: -1, secs: 70 },
-      ].map((r) => ({ ...r, base: 0, render: 0, copyW: 0, frozen: false }));
+        { el: rowEls[1], dir: -1, secs: 150 },
+        { el: rowEls[2], dir: -1, secs: 112 },
+      ].map((r) => ({ ...r, base: 0, render: 0, copyH: 0, frozen: false }));
 
-      const measure = (r) => (r.copyW = r.el.scrollWidth / 3 || 0);
+      const measure = (r) => (r.copyH = r.el.scrollHeight / 3 || 0);
       const measureAll = () => rows.forEach(measure);
       measureAll();
       window.addEventListener("resize", measureAll);
@@ -1825,10 +1879,14 @@
         if (!im.complete) im.addEventListener("load", measureAll, { once: true });
       });
       window.addEventListener("load", measureAll);
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(measureAll);
+        rowEls.forEach((el) => ro.observe(el));
+      }
 
       if (reduce) {
         rows.forEach((r) => {
-          r.el.style.transform = `translate3d(${-r.copyW}px,0,0)`;
+          r.el.style.transform = `translate3d(0,${-r.copyH}px,0)`;
         });
         return;
       }
@@ -1858,15 +1916,15 @@
         const dt = Math.min((t - prev) / 1000, 0.05);
         prev = t;
         for (const r of rows) {
-          if (!r.copyW) measure(r);
-          if (!r.frozen && r.copyW) {
-            r.base += r.dir * (r.copyW / r.secs) * dt;
+          if (!r.copyH) measure(r);
+          if (!r.frozen && r.copyH) {
+            r.base += r.dir * (r.copyH / r.secs) * dt;
           }
           r.render += (r.base - r.render) * 0.12;
-          let m = r.copyW ? r.render % r.copyW : 0;
-          if (m > 0) m -= r.copyW;
-          const x = m - r.copyW;
-          r.el.style.transform = `translate3d(${x}px,0,0)`;
+          let m = r.copyH ? r.render % r.copyH : 0;
+          if (m > 0) m -= r.copyH;
+          const y = m - r.copyH;
+          r.el.style.transform = `translate3d(0,${y}px,0)`;
         }
         requestAnimationFrame(frame);
       }
