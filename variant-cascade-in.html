@@ -515,12 +515,12 @@
          Same mosaic + engine as desktop, scaled down to the mobile band
          height. The collage is authored in a 2201×475 space (Figma 390:52078),
          so a per-comp-px unit (--mu) maps it into the shorter mobile band. */
-      /* ---- Full-bleed image field — 2 VERTICAL columns ----
-         Mobile Cascade: two columns fill the whole hero, drifting up/down behind
-         everything. Only the top ~half is visible; the bottom-anchored white
-         pedestal (.m1-scrim) dissolves the lower portion into solid white where
-         the signup sits — keeping the proven bottom-pedestal legibility while the
-         vertical-column character matches the desktop. */
+      /* ---- Full-bleed image field — vertical marquee columns ----
+         Mobile Cascade: columns fill the whole hero, drifting up/down behind
+         everything. The signup is lifted into the shared bottom-pinned bar
+         (mobile-extras.js, keyed on .m7-intro); that bar's own subtle white
+         gradient pedestal (.m-sticky::before) is the only white scrim, so the
+         field stays full-bleed and reveals more imagery — matching mosaic. */
       .m1-field {
         position: absolute;
         inset: 0;
@@ -547,25 +547,9 @@
         height: max-content;
         will-change: transform;
       }
-      .m1-scrim {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        /* A bottom-anchored white pedestal. Solid white backs the whole signup
-           cluster (headline → card → disclaimer) AND a clean gap above it, then a
-           short ramp dissolves the columns into the white. The columns keep
-           scrolling visibly in the top ~46% of the hero above this pedestal. */
-        height: calc(470 * var(--u));
-        z-index: 1;
-        pointer-events: none;
-        background: linear-gradient(
-          to top,
-          #fff 0%,
-          #fff 86%,
-          rgba(255, 255, 255, 0) 100%
-        );
-      }
+      /* In-hero white pedestal removed: the signup lives in the shared
+         bottom-pinned bar, whose .m-sticky::before gradient is the only white
+         scrim — keeping this field full-bleed like mosaic. */
 
       .m1-ph {
         width: 100%;
@@ -1472,8 +1456,8 @@
       </header>
 
       <!-- Heading + subhead + email card -->
-      <div class="m1-stack">
-        <div class="m1-textwrap ft-in-white">
+      <div class="m1-stack m7-stack">
+        <div class="m1-textwrap m7-intro ft-in-white">
           <h1 class="m1-headline">Your business<br />starts with Shopify</h1>
           <p class="m1-subhead">
             Try 3 days free, then $1/month for 3 months.<br />What are you
@@ -1525,7 +1509,6 @@
         <div class="m1-row"><div class="m1-track" id="m1-row1"></div></div>
         <div class="m1-row"><div class="m1-track" id="m1-row2"></div></div>
       </div>
-      <div class="m1-scrim" aria-hidden="true"></div>
     </section>
 
     
