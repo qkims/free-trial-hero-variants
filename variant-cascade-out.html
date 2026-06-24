@@ -91,98 +91,14 @@
         );
       }
 
-      /* ---- Frosted-glass signup PANEL — a discrete auth card centered over
-         the vertical gallery wall (above the scrim, z-index 3). Legibility is
-         guaranteed STRUCTURALLY: the panel is near-opaque by default (the solid
-         fallback below), and the blur is layered on only as a finishing gloss
-         where the browser supports it. The black signup-card inside carries the
-         real CTA contrast regardless of what scrolls behind. ---- */
-      .v1-heading {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: calc(556 * var(--u));
+      /* ---- Signup cluster — Control's white intro card + black email CTA
+         (.hero__stack / .hero__intro / .signup-card from styles.css). Floats
+         over the full-bleed image field, just below optical center. The shared
+         rule sets z-index:1, but here the field's white scrim also sits at z1,
+         so lift the stack above it. ---- */
+      .v1-hero .hero__stack {
         z-index: 3;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: calc(28 * var(--u));
-        text-align: center;
-        padding: calc(52 * var(--u)) calc(48 * var(--u)) calc(44 * var(--u));
-        border-radius: calc(34 * var(--u));
-        /* Default = near-opaque white plate (the legibility floor). */
-        background: rgba(255, 255, 255, 0.86);
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        box-shadow:
-          0 calc(30 * var(--u)) calc(72 * var(--u)) rgba(0, 0, 0, 0.2),
-          0 calc(2 * var(--u)) calc(10 * var(--u)) rgba(0, 0, 0, 0.08);
       }
-      /* Glass gloss only where supported — slightly lighter alpha + blur over
-         the moving columns. Blur capped at 22px (compositor cost over 5 live
-         columns); never applied to anything but this one static panel. */
-      @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-        .v1-heading {
-          background: rgba(255, 255, 255, 0.7);
-          -webkit-backdrop-filter: blur(22px) saturate(140%);
-          backdrop-filter: blur(22px) saturate(140%);
-        }
-      }
-      /* The heading is centered via translate(-50%,-50%), so the shared `ft-rise`
-         entrance would clobber that offset. Use a v1-scoped keyframe that keeps
-         the centering and rises into place from just below. */
-      @keyframes ft-rise-v1 {
-        0%,
-        16% {
-          transform: translate(-50%, -50%) translateY(calc(120 * var(--u)));
-        }
-        100% {
-          transform: translate(-50%, -50%) translateY(0);
-        }
-      }
-      @media (prefers-reduced-motion: no-preference) {
-        .v1-heading.ft-in-white {
-          animation:
-            ft-rise-v1 0.95s cubic-bezier(0.16, 1, 0.3, 1) both,
-            ft-fade 0.45s ease both;
-        }
-      }
-
-      .v1-textwrap {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: calc(16 * var(--u));
-        width: 100%;
-      }
-
-      /* T1 heading (node 1:46280): Inter Light, 64/69, -1.28 */
-      .v1-headline {
-        margin: 0;
-        font-weight: 300;
-        font-size: calc(64 * var(--u));
-        line-height: calc(69 * var(--u));
-        letter-spacing: calc(-1.28 * var(--u));
-        color: #000;
-        font-feature-settings: "ss03" 1;
-      }
-
-      .v1-subhead {
-        margin: 0;
-        font-weight: 400;
-        font-size: calc(18 * var(--u));
-        line-height: 1.2;
-        letter-spacing: calc(-0.18 * var(--u));
-        color: rgba(0, 0, 0, 0.6);
-        font-feature-settings: "ss03" 1;
-      }
-
-      .v1-subhead strong {
-        font-weight: 400;
-        color: #000;
-      }
-
-      /* Email field is the shared .signup-card from styles.css (node 207:6658). */
 
       /* ---- Full-bleed image field — VERTICAL columns ----
          Five columns fill the hero left-to-right. Each column scrolls
@@ -1031,12 +947,12 @@
 
     <!-- Hero (Variant 1) -->
     <section class="v1-hero" aria-label="Your business starts with Shopify">
-      <div class="v1-heading ft-in-white">
-        <div class="v1-textwrap">
-          <h1 class="v1-headline">Your business<br />starts with Shopify</h1>
-          <p class="v1-subhead">
-            Try 3 days free, then <strong>$1/month for 3 months.</strong><br />
-            What are you waiting for?
+      <div class="hero__stack">
+        <div class="hero__intro ft-in-white">
+          <h1 class="hero__headline">Your business<br />starts with Shopify</h1>
+          <p class="hero__subhead">
+            Try 3 days free, then <strong>$1/month for 3 months.</strong> What
+            are you waiting for?
           </p>
         </div>
 
